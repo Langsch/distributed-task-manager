@@ -1,3 +1,10 @@
+"""
+Database module for the University Management System.
+
+This module handles database initialization, table creation, and provides
+the SQLAlchemy engine for database operations.
+"""
+
 from sqlalchemy import create_engine, text
 import os
 
@@ -6,6 +13,16 @@ db_path = os.path.join(os.path.dirname(__file__), 'university.sqlite')
 engine = create_engine(f'sqlite:///{db_path}')
 
 def init_db():
+    """
+    Initialize the database with required tables and sample data.
+    
+    Creates:
+    - university table: stores university information
+    - course table: stores available courses 
+    - university_course table: many-to-many relationship between universities and courses
+    
+    Also populates sample data for testing.
+    """
     with engine.begin() as conn:
         # Universities table
         conn.execute(text("""
@@ -13,43 +30,16 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 state TEXT NOT NULL,
-                type TEXT NOT NULL,
-                founded_year INTEGER,
-                student_count INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                type TEXT NOT NULL
             );
-        """))
-
-        # Sample data
-        conn.execute(text("""
-            INSERT INTO university (name, state, type, founded_year, student_count) VALUES
-                ('UFRJ', 'RJ', 'public', 1920, 45000),
-                ('PUC-Rio', 'RJ', 'private', 1941, 23000),
-                ('USP', 'SP', 'public', 1934, 60000),
-                ('Unicamp', 'SP', 'public', 1966, 37000)
-            ON CONFLICT DO NOTHING;
         """))
 
         # Courses table
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS course (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
-                duration_years INTEGER DEFAULT 4,
-                area TEXT NOT NULL
+                name TEXT NOT NULL UNIQUE
             );
-        """))
-
-        conn.execute(text("""
-            INSERT INTO course (name, duration_years, area) VALUES
-                ('Ciência da Computação', 4, 'Exatas'),
-                ('Engenharia de Software', 4, 'Exatas'),
-                ('Medicina', 6, 'Saúde'),
-                ('Direito', 5, 'Humanas'),
-                ('Biologia', 4, 'Biológicas'),
-                ('História', 4, 'Humanas'),
-                ('Matemática', 4, 'Exatas')
-            ON CONFLICT DO NOTHING;
         """))
 
         # University-Course relationship
@@ -57,29 +47,38 @@ def init_db():
             CREATE TABLE IF NOT EXISTS university_course (
                 university_id INTEGER NOT NULL,
                 course_id INTEGER NOT NULL,
-                annual_spots INTEGER DEFAULT 50,
-                tuition_fee DECIMAL(10,2) DEFAULT 0.00,
                 PRIMARY KEY (university_id, course_id),
                 FOREIGN KEY (university_id) REFERENCES university (id),
                 FOREIGN KEY (course_id) REFERENCES course (id)
             );
         """))
 
-        # Students table
+        # Sample universities
         conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS student (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                university_id INTEGER NOT NULL,
-                course_id INTEGER NOT NULL,
-                enrollment_year INTEGER NOT NULL,
-                status TEXT DEFAULT 'active',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (university_id) REFERENCES university (id),
-                FOREIGN KEY (course_id) REFERENCES course (id)
-            );
+            INSERT INTO university (name, state, type) VALUES
+                ('UFRJ', 'RJ', 'public'),
+                ('PUC-Rio', 'RJ', 'private'),
+                ('USP', 'SP', 'public'),
+                ('Unicamp', 'SP', 'public')
+            ON CONFLICT DO NOTHING;
+        """))
+
+        # Sample courses (fixed list as specified)
+        conn.execute(text("""
+            INSERT INTO course (name) VALUES
+                ('Ciência da computação'),
+                ('Biologia'),
+                ('História'),
+                ('Direito'),
+                ('Medicina')
+            ON CONFLICT DO NOTHING;
         """))
 
 def get_engine():
+    """
+    Get the SQLAlchemy engine instance.
+    
+    Returns:
+        Engine: SQLAlchemy engine configured for the university database
+    """
     return engine

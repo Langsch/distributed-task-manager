@@ -1,21 +1,9 @@
-# Configuration file for the distributed university management system
+# Configuration for the Distributed University Management System
 
-# Coordinator Configuration (Computer 1)
-COORDINATOR_HOST = "0.0.0.0"
-COORDINATOR_PORT = 8000
+# Coordinator Configuration (Computer 1 - Main Server)
+COORDINATOR_HOST = "0.0.0.0"  # Listen on all interfaces
+COORDINATOR_PORT = 8000       # Standard HTTP port for API
 
-# Worker Configuration (Computer 2)
-WORKER_HOST = "0.0.0.0"  
-WORKER_PORT = 8001
-
-# Network Configuration
-# UPDATE THIS: Replace with Computer 1's actual IP address
-COORDINATOR_IP = "192.168.0.98"
-
-# Database Configuration
-DATABASE_NAME = "university.sqlite"
-
-# System Configuration
-MAX_WORKERS = 5
-HEALTH_CHECK_INTERVAL = 30  # seconds
-REQUEST_TIMEOUT = 10  # seconds
+# Client Configuration
+# When running client scripts from Computer 2, update the target IP:
+# COORDINATOR_IP = "192.168.1.100"  # Replace with Computer 1's actual IP
