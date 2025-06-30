@@ -1,30 +1,16 @@
 """
 Database module for the University Management System.
-
-This module handles database initialization, table creation, and provides
-the SQLAlchemy engine for database operations.
 """
 
 from sqlalchemy import create_engine, text
 import os
 
-# Database will be created in coordinator directory
 db_path = os.path.join(os.path.dirname(__file__), 'university.sqlite')
 engine = create_engine(f'sqlite:///{db_path}')
 
 def init_db():
-    """
-    Initialize the database with required tables and sample data.
-    
-    Creates:
-    - university table: stores university information
-    - course table: stores available courses 
-    - university_course table: many-to-many relationship between universities and courses
-    
-    Also populates sample data for testing.
-    """
+    """Initialize the database with tables and sample data."""
     with engine.begin() as conn:
-        # Universities table
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS university (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,7 +20,6 @@ def init_db():
             );
         """))
 
-        # Courses table
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS course (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +27,6 @@ def init_db():
             );
         """))
 
-        # University-Course relationship
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS university_course (
                 university_id INTEGER NOT NULL,
@@ -53,7 +37,6 @@ def init_db():
             );
         """))
 
-        # Sample universities
         conn.execute(text("""
             INSERT INTO university (name, state, type) VALUES
                 ('UFRJ', 'RJ', 'public'),
@@ -63,7 +46,6 @@ def init_db():
             ON CONFLICT DO NOTHING;
         """))
 
-        # Sample courses (fixed list as specified)
         conn.execute(text("""
             INSERT INTO course (name) VALUES
                 ('Ciência da computação'),
@@ -75,10 +57,5 @@ def init_db():
         """))
 
 def get_engine():
-    """
-    Get the SQLAlchemy engine instance.
-    
-    Returns:
-        Engine: SQLAlchemy engine configured for the university database
-    """
+    """Get the SQLAlchemy engine instance."""
     return engine

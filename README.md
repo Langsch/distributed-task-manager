@@ -1,18 +1,19 @@
 # Distributed University Management System
 
-A clean, simple distributed system built with FastAPI that demonstrates REST API communication between two computers.
+I built this distributed system to show how two computers can communicate through a REST API. It's a straightforward FastAPI application that manages university data across a network.
 
-## Overview
+## What it does
 
-This project shows how to connect two computers through a distributed REST API:
-- **Computer 1 (Server)**: Runs the university management API using FastAPI
-- **Computer 2 (Client)**: Makes HTTP requests to Computer 1's API server
+This connects two computers in a simple client-server setup:
+- **Computer 1** runs the university management API server
+- **Computer 2** makes HTTP requests to manage university data remotely
 
 ## Features
 
-- University management (CRUD operations)
+- University management (create, read, update, delete)
+- Course assignment system
 - RESTful API design
-- SQLite database
+- SQLite database storage
 
 ## Setup Instructions
 
@@ -32,7 +33,7 @@ ip addr show | grep inet | grep -v 127.0.0.1
 # or
 hostname -I
 ```
-Note down the IP address (e.g., 192.168.1.100) - you'll need this for Computer 2.
+Write down the IP address (like 192.168.1.100) - you'll need this for Computer 2.
 
 **Step 3: Configure Firewall (if needed)**
 ```bash
@@ -46,7 +47,7 @@ sudo ufw allow from 192.168.1.0/24 to any port 8000
 ```bash
 ./scripts/start_coordinator.sh
 ```
-Keep this terminal open - the server logs will show here.
+Keep this terminal open - the server logs will appear here.
 
 **Step 5: Test Server is Running**
 ```bash
@@ -83,10 +84,10 @@ curl http://192.168.1.100:8000/health
 ```bash
 ./scripts/client_demo.sh
 ```
-This will demonstrate all API operations from Computer 2 to Computer 1.
+This demonstrates all API operations from Computer 2 to Computer 1.
 
 ### Local Testing (Single Computer)
-If you want to test everything on one computer first:
+To test everything on one computer first:
 ```bash
 ./scripts/demo.sh
 ```
@@ -151,22 +152,6 @@ distributed-task-manager/
 - **SQLite** - Lightweight database
 - **uvicorn** - ASGI server
 
-## Sample Data
-
-The system comes with sample universities and courses:
-
-**Universities:**
-- UFRJ (RJ, public)
-- PUC-Rio (RJ, private)  
-- USP (SP, public)
-- Unicamp (SP, public)
-
-**Courses:**
-- Ciência da computação
-- Biologia
-- História
-- Direito
-- Medicina
 
 ## Distributed Setup Guide
 
@@ -177,12 +162,12 @@ For step-by-step setup instructions, run:
 
 ## What This Demonstrates
 
-- ✅ **Simple Architecture**: Clean client-server model without unnecessary complexity
-- ✅ **Network Communication**: Computer 2 making HTTP requests to Computer 1
-- ✅ **Real Distribution**: Two separate computers communicating over the network
-- ✅ **RESTful Design**: Proper HTTP methods and status codes
-- ✅ **Data Persistence**: SQLite database maintains state across requests
-- ✅ **Easy to Understand**: Minimal codebase focused on core concepts
+- **Simple Architecture**: Clean client-server model without unnecessary complexity
+- **Network Communication**: Computer 2 making HTTP requests to Computer 1
+- **Real Distribution**: Two separate computers communicating over the network
+- **RESTful Design**: Proper HTTP methods and status codes
+- **Data Persistence**: SQLite database maintains state across requests
+- **Easy to Understand**: Minimal codebase focused on core concepts
 
 ## Testing & Verification
 
@@ -219,7 +204,7 @@ curl http://COMPUTER1_IP:8000/health
 ### Troubleshooting
 
 **Connection Issues:**
-- Ensure both computers are on the same network
+- Make sure both computers are on the same network
 - Check firewall settings on Computer 1 (allow port 8000)
 - Verify Computer 1's IP address is correct in client_demo.sh
 - Make sure Computer 1 server is running (check terminal output)
@@ -244,7 +229,6 @@ curl -v http://COMPUTER1_IP:8000/health
 **Common Issues:**
 - **Firewall blocking**: Run `sudo ufw allow 8000` on Computer 1
 - **Wrong IP address**: Double-check with `hostname -I` on Computer 1
-- **Network isolation**: Ensure both computers are on same subnet
+- **Network isolation**: Make sure both computers are on same subnet
 - **Server not started**: Verify start_coordinator.sh is running and showing "Uvicorn running"
 
-This is a perfect example of a clean, well-documented distributed system! 🚀

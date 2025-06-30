@@ -1,30 +1,8 @@
 """
-University Management API - Distributed System Coordinator
+University Management API
 
-A FastAPI-based REST API for managing universities and their courses.
-This serves as the main server in a distributed system where other computers
-can make HTTP requests to manage university data.
-
-Main Features:
-- Complete CRUD operations for universities
-- Course assignment to universities  
-- Clean RESTful API design
-- SQLite database backend
-- Designed for distributed client-server architecture
-
-API Endpoints:
-- GET /universities - List all universities
-- POST /universities - Create a new university
-- GET /universities/{id} - Get university details with courses
-- PUT /universities/{id} - Update university details
-- DELETE /universities/{id} - Delete university
-- PUT /universities/{id}/courses - Assign courses to university
-- GET /health - Health check
-
-Usage:
-    python main.py
-    # or
-    uvicorn main:app --host 0.0.0.0 --port 8000
+FastAPI-based REST API for managing universities and their courses.
+Designed for distributed client-server architecture.
 """
 
 from typing import Literal, List
@@ -34,7 +12,6 @@ from sqlalchemy import text
 
 from database import get_engine, init_db
 
-# Initialize database
 init_db()
 engine = get_engine()
 
@@ -44,13 +21,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Constants
 UNIVERSITY_NOT_FOUND = "University not found"
 SELECT_UNIVERSITY_BY_ID = """
     SELECT id FROM university WHERE id = :id
 """
-
-# Pydantic Models
 class UniversityCreate(BaseModel):
     name: str
     state: str
@@ -75,7 +49,6 @@ class University(BaseModel):
     type: str
     courses: List[Course] = []
 
-# University Management Endpoints
 @app.get("/universities")
 def get_universities():
     """Get all universities"""
@@ -111,7 +84,6 @@ def create_university(university: UniversityCreate):
 def get_university(id: int):
     """Get university details with courses"""
     with engine.begin() as conn:
-        # Get university
         result = conn.execute(text("""
             SELECT * FROM university WHERE id = :id
         """), {"id": id})
@@ -120,7 +92,6 @@ def get_university(id: int):
         if not university:
             raise HTTPException(status_code=404, detail=UNIVERSITY_NOT_FOUND)
         
-        # Get university courses
         result = conn.execute(text("""
             SELECT c.id, c.name 
             FROM course c
@@ -142,13 +113,11 @@ def get_university(id: int):
 def update_university(id: int, university: UniversityUpdate):
     """Update university details"""
     with engine.begin() as conn:
-        # Check if university exists
         result = conn.execute(text(SELECT_UNIVERSITY_BY_ID), {"id": id})
         
         if not result.first():
             raise HTTPException(status_code=404, detail=UNIVERSITY_NOT_FOUND)
         
-        # Update university
         conn.execute(text("""
             UPDATE university 
             SET name = :name, state = :state, type = :type
@@ -166,18 +135,15 @@ def update_university(id: int, university: UniversityUpdate):
 def delete_university(id: int):
     """Delete university"""
     with engine.begin() as conn:
-        # Check if university exists
         result = conn.execute(text(SELECT_UNIVERSITY_BY_ID), {"id": id})
         
         if not result.first():
             raise HTTPException(status_code=404, detail=UNIVERSITY_NOT_FOUND)
         
-        # Delete university courses first (foreign key constraint)
         conn.execute(text("""
             DELETE FROM university_course WHERE university_id = :id
         """), {"id": id})
         
-        # Delete university
         conn.execute(text("""
             DELETE FROM university WHERE id = :id
         """), {"id": id})
@@ -188,13 +154,11 @@ def delete_university(id: int):
 def assign_courses(id: int, assignment: CourseAssignment):
     """Assign courses to university"""
     with engine.begin() as conn:
-        # Check if university exists
         result = conn.execute(text(SELECT_UNIVERSITY_BY_ID), {"id": id})
         
         if not result.first():
             raise HTTPException(status_code=404, detail=UNIVERSITY_NOT_FOUND)
         
-        # Validate all course IDs exist
         if assignment.courses:
             placeholders = ",".join([":course" + str(i) for i in range(len(assignment.courses))])
             params = {"course" + str(i): course_id for i, course_id in enumerate(assignment.courses)}
@@ -206,12 +170,10 @@ def assign_courses(id: int, assignment: CourseAssignment):
             if result.scalar() != len(assignment.courses):
                 raise HTTPException(status_code=400, detail="One or more course IDs are invalid")
         
-        # Remove existing course assignments
         conn.execute(text("""
             DELETE FROM university_course WHERE university_id = :id
         """), {"id": id})
         
-        # Add new course assignments
         for course_id in assignment.courses:
             conn.execute(text("""
                 INSERT INTO university_course (university_id, course_id)

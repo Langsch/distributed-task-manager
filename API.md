@@ -1,6 +1,6 @@
 # University Management API Documentation
 
-A RESTful API for managing universities and their courses in a distributed system.
+REST API for managing universities and their courses in a distributed system.
 
 ## Base URL
 
@@ -224,7 +224,7 @@ curl -X PUT http://localhost:8000/universities/1/courses \
 ```
 
 ### Available Courses
-The system includes these pre-defined courses:
+The system includes these predefined courses:
 
 | ID | Name |
 |----|------|
@@ -351,4 +351,4 @@ For distributed communication between two computers:
 ./scripts/client_demo.sh
 ```
 
-The client demo script demonstrates all API endpoints working across the network between two computers.
+The client demo script shows all API endpoints working across the network between two computers.

@@ -4,26 +4,24 @@ echo "=== Distributed University Management Client Demo ==="
 echo "Running on Computer 2 - Making requests to Computer 1"
 echo ""
 
-# Configuration - Update with Computer 1's IP address
-COORDINATOR_IP="${COORDINATOR_IP:-192.168.1.100}"  # UPDATE: Computer 1's IP address
+COORDINATOR_IP="${COORDINATOR_IP:-192.168.1.100}"
 COORDINATOR_URL="http://${COORDINATOR_IP}:8000"
 
-echo "🎯 Target: Computer 1 at $COORDINATOR_URL"
+echo "Target: Computer 1 at $COORDINATOR_URL"
 echo ""
 
-# Check if coordinator is reachable
 echo "1. Testing connection to Computer 1..."
 if ! curl -s --connect-timeout 5 $COORDINATOR_URL/health > /dev/null; then
-    echo "❌ Cannot reach Computer 1. Please check:"
+    echo "Cannot reach Computer 1. Please check:"
     echo "   - Computer 1 is running: ./scripts/start_coordinator.sh"
     echo "   - IP address is correct: $COORDINATOR_IP"
     echo "   - Network connectivity and firewall settings"
     exit 1
 fi
-echo "✅ Successfully connected to Computer 1!"
+echo "Successfully connected to Computer 1!"
 
 echo ""
-echo "🌐 Demo: Computer 2 making requests to Computer 1's API"
+echo "Demo: Computer 2 making requests to Computer 1's API"
 
 # 2. Get coordinator health
 echo ""
@@ -86,12 +84,12 @@ echo "11. Final universities list:"
 curl -s $COORDINATOR_URL/universities | python3 -m json.tool
 
 echo ""
-echo "✅ Distributed demo complete!"
+echo "Distributed demo complete!"
 echo ""
-echo "🎯 Summary:"
-echo "  ✅ Computer 2 successfully connected to Computer 1"
-echo "  ✅ Performed CRUD operations on Computer 1 from Computer 2"
-echo "  ✅ University created, updated, and deleted remotely"
-echo "  ✅ Demonstrates true distributed REST API communication!"
+echo "Summary:"
+echo "  - Computer 2 successfully connected to Computer 1"
+echo "  - Performed CRUD operations on Computer 1 from Computer 2"
+echo "  - University created, updated, and deleted remotely"
+echo "  - Demonstrates distributed REST API communication"
 echo ""
-echo "🌐 This shows Computer 2 acting as a client to Computer 1's API server"
+echo "This shows Computer 2 acting as a client to Computer 1's API server"
