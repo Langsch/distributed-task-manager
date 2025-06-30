@@ -10,38 +10,83 @@ This project shows how to connect two computers through a distributed REST API:
 
 ## Features
 
-- ✅ Complete university management (CRUD operations)
-- ✅ Course assignment to universities  
-- ✅ Clean RESTful API design
-- ✅ SQLite database backend
-- ✅ True distributed client-server communication
-- ✅ Easy setup and demonstration
+- University management (CRUD operations)
+- RESTful API design
+- SQLite database
 
-## Quick Start
+## Setup Instructions
 
-### Setup (Both Computers)
+### Computer 1 (Server Setup)
+
+**Step 1: Clone and Setup**
 ```bash
-# Clone and setup
-git clone <repository>
+git clone https://github.com/Langsch/distributed-task-manager.git
 cd distributed-task-manager
 ./scripts/setup.sh
 ```
 
-### Running the System
+**Step 2: Find Your IP Address**
+```bash
+# Find your network IP address
+ip addr show | grep inet | grep -v 127.0.0.1
+# or
+hostname -I
+```
+Note down the IP address (e.g., 192.168.1.100) - you'll need this for Computer 2.
 
-**Computer 1 (Server):**
+**Step 3: Configure Firewall (if needed)**
+```bash
+# Allow port 8000 through firewall
+sudo ufw allow 8000
+# or for specific networks
+sudo ufw allow from 192.168.1.0/24 to any port 8000
+```
+
+**Step 4: Start the Server**
 ```bash
 ./scripts/start_coordinator.sh
 ```
+Keep this terminal open - the server logs will show here.
 
-**Computer 2 (Client):**
+**Step 5: Test Server is Running**
 ```bash
-# First, update the IP address in scripts/client_demo.sh
-# Then run the client demo
-./scripts/client_demo.sh
+# In a new terminal, test locally
+curl http://localhost:8000/health
+# Should return: {"status":"healthy"}
 ```
 
-### Testing Locally
+### Computer 2 (Client Setup)
+
+**Step 1: Clone and Setup**
+```bash
+git clone https://github.com/Langsch/distributed-task-manager.git
+cd distributed-task-manager
+./scripts/setup.sh
+```
+
+**Step 2: Configure Client**
+Edit the client demo script with Computer 1's IP address:
+```bash
+nano scripts/client_demo.sh
+# Change line 6: SERVER_IP="localhost" 
+# To: SERVER_IP="192.168.1.100"  # Use Computer 1's actual IP
+```
+
+**Step 3: Test Connection**
+```bash
+# Test if you can reach Computer 1
+ping 192.168.1.100  # Use Computer 1's IP
+curl http://192.168.1.100:8000/health
+```
+
+**Step 4: Run Client Demo**
+```bash
+./scripts/client_demo.sh
+```
+This will demonstrate all API operations from Computer 2 to Computer 1.
+
+### Local Testing (Single Computer)
+If you want to test everything on one computer first:
 ```bash
 ./scripts/demo.sh
 ```
@@ -139,24 +184,67 @@ For step-by-step setup instructions, run:
 - ✅ **Data Persistence**: SQLite database maintains state across requests
 - ✅ **Easy to Understand**: Minimal codebase focused on core concepts
 
-## Troubleshooting
+## Testing & Verification
+
+### Step-by-Step Testing Process
+
+**1. Verify Computer 1 Server is Running**
+```bash
+# On Computer 1
+curl http://localhost:8000/health
+# Expected: {"status":"healthy"}
+```
+
+**2. Test Network Connectivity**
+```bash
+# On Computer 2
+ping COMPUTER1_IP
+# Should show successful ping responses
+```
+
+**3. Test Remote API Access**
+```bash
+# On Computer 2
+curl http://COMPUTER1_IP:8000/health
+# Expected: {"status":"healthy"}
+```
+
+**4. Test Full API Operations**
+```bash
+# On Computer 2
+./scripts/client_demo.sh
+# This runs a complete test of all API endpoints
+```
+
+### Troubleshooting
 
 **Connection Issues:**
 - Ensure both computers are on the same network
-- Check firewall settings on Computer 1
-- Verify Computer 1's IP address is correct
-- Make sure Computer 1 is running the server
+- Check firewall settings on Computer 1 (allow port 8000)
+- Verify Computer 1's IP address is correct in client_demo.sh
+- Make sure Computer 1 server is running (check terminal output)
 
-**Common Commands:**
+**Network Testing Commands:**
 ```bash
-# Check if server is running
-curl http://COMPUTER1_IP:8000/health
-
-# Test network connectivity
+# Test basic connectivity
 ping COMPUTER1_IP
 
-# View server logs
-# Check terminal where start_coordinator.sh is running
+# Test if port 8000 is reachable
+telnet COMPUTER1_IP 8000
+# or
+nc -zv COMPUTER1_IP 8000
+
+# Test API health endpoint
+curl -v http://COMPUTER1_IP:8000/health
+
+# Check server logs on Computer 1
+# Look at the terminal where start_coordinator.sh is running
 ```
+
+**Common Issues:**
+- **Firewall blocking**: Run `sudo ufw allow 8000` on Computer 1
+- **Wrong IP address**: Double-check with `hostname -I` on Computer 1
+- **Network isolation**: Ensure both computers are on same subnet
+- **Server not started**: Verify start_coordinator.sh is running and showing "Uvicorn running"
 
 This is a perfect example of a clean, well-documented distributed system! 🚀
